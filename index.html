@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Практическое занятие: ИТ в здравоохранении</title>
+<style>
+/* ===== RESET & BASE ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.55;color:#1a2233;background:#f0f4f9}
+
+/* ===== LOGIN ===== */
+#login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d2b5e 0%,#1a4fa0 60%,#2563c4 100%)}
+.login-card{background:#fff;border-radius:16px;padding:40px 44px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.22)}
+.login-card h1{font-size:1.22rem;color:#0d2b5e;margin-bottom:4px;line-height:1.3}
+.login-card .subtitle{font-size:.85rem;color:#5a6a8a;margin-bottom:24px}
+.login-card label{display:block;font-size:.8rem;font-weight:600;color:#0d2b5e;margin-bottom:4px;margin-top:14px;letter-spacing:.03em;text-transform:uppercase}
+.login-card input{width:100%;padding:10px 13px;border:1.5px solid #c9d4e8;border-radius:8px;font-size:.97rem;outline:none;transition:border .2s}
+.login-card input:focus{border-color:#1a4fa0}
+.btn-start{margin-top:22px;width:100%;padding:12px;background:#1a4fa0;color:#fff;border:none;border-radius:9px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:background .2s}
+.btn-start:hover{background:#0d2b5e}
+.login-note{margin-top:14px;font-size:.78rem;color:#8a99b5;text-align:center}
+
+/* ===== MAIN ===== */
+#main-wrap{display:none;max-width:860px;margin:0 auto;padding:24px 18px 60px}
+
+/* header */
+.top-bar{background:linear-gradient(90deg,#0d2b5e,#1a4fa0);color:#fff;border-radius:12px;padding:18px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.top-bar h1{font-size:1.1rem;font-weight:700}
+.variant-badge{background:rgba(255,255,255,.18);border-radius:7px;padding:6px 14px;font-size:.9rem;font-weight:700;white-space:nowrap}
+.student-info{font-size:.8rem;opacity:.8;width:100%}
+
+/* progress */
+.progress-wrap{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.progress-label{font-size:.8rem;color:#5a6a8a;margin-bottom:6px;display:flex;justify-content:space-between}
+.progress-bar{height:8px;background:#dde4f0;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#1a4fa0,#2563c4);border-radius:4px;transition:width .4s}
+
+/* blocks */
+.block{background:#fff;border-radius:12px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden}
+.bh{padding:15px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none;transition:background .15s}
+.bh:hover{background:#f4f7ff}
+.bh-num{width:32px;height:32px;border-radius:50%;background:#e8edf8;color:#1a4fa0;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bh-title{flex:1;font-weight:700;color:#0d2b5e;font-size:.97rem}
+.bh-time{font-size:.75rem;color:#8a99b5;white-space:nowrap}
+.bh-arrow{font-size:.9rem;color:#8a99b5;transition:transform .25s}
+.block.open .bh-arrow{transform:rotate(180deg)}
+.bb{display:none;padding:18px 22px;border-top:1.5px solid #edf0f8}
+.block.open .bb{display:block}
+
+/* tasks */
+.ti{background:#f4f7ff;border-left:4px solid #1a4fa0;border-radius:0 8px 8px 0;padding:11px 14px;margin:12px 0 6px;font-weight:600;color:#0d2b5e;font-size:.9rem}
+.tcb{width:100%;min-height:80px;padding:10px 13px;border:1.5px solid #c9d4e8;border-radius:8px;font-size:.9rem;font-family:inherit;resize:vertical;outline:none;transition:border .2s;background:#fafbff}
+.tcb:focus{border-color:#1a4fa0}
+
+/* prompts */
+.pb2{background:#fff8e6;border:1.5px solid #f4c842;border-radius:9px;padding:12px 15px;margin:10px 0;font-size:.88rem}
+.pb2 strong{color:#7a5800}
+.pt{background:#e8f4e8;border:1.5px solid #4caf50;border-radius:9px;padding:12px 15px;margin:10px 0;font-size:.88rem}
+.pt strong{color:#1b5e20}
+.pb2 code,.pt code{display:block;margin-top:7px;background:rgba(0,0,0,.05);padding:8px 10px;border-radius:6px;font-size:.83rem;line-height:1.5;white-space:pre-wrap;font-family:'Consolas',monospace}
+
+/* clin case */
+.clin-box{background:#fef6ff;border:1.5px solid #c084fc;border-radius:10px;padding:14px 16px;margin:10px 0;font-size:.92rem;line-height:1.6}
+.clin-box strong{color:#6b21a8}
+
+/* lab table */
+.lab-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.87rem}
+.lab-table th{background:#0d2b5e;color:#fff;padding:8px 10px;text-align:left;font-weight:600}
+.lab-table td{padding:7px 10px;border-bottom:1px solid #edf0f8}
+.lab-table tr:nth-child(even) td{background:#f8faff}
+.val-up{color:#c0392b;font-weight:700}
+.val-down{color:#2980b9;font-weight:700}
+.val-norm{color:#27ae60}
+
+/* criteria */
+.cr-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.86rem}
+.cr-table th{background:#f4f7ff;color:#0d2b5e;padding:7px 10px;border:1px solid #dde4f0;font-weight:700}
+.cr-table td{padding:7px 10px;border:1px solid #dde4f0;vertical-align:top}
+
+/* checklist */
+.chk-item{display:flex;align-items:flex-start;gap:10px;margin:7px 0;font-size:.88rem}
+.chk-item input[type=checkbox]{margin-top:3px;accent-color:#1a4fa0;width:16px;height:16px}
+
+/* info box */
+.info-box{background:#e8f0fe;border-left:4px solid #1a4fa0;border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.87rem;color:#0d2b5e}
+
+/* warning box */
+.warn-box{background:#fff3cd;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:.87rem;color:#78350f}
+
+/* print btn */
+.btn-print{display:block;margin:20px auto 0;padding:13px 40px;background:#0d2b5e;color:#fff;border:none;border-radius:9px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.03em;transition:background .2s}
+.btn-print:hover{background:#1a4fa0}
+
+/* score */
+.score-box{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.score-item{flex:1;min-width:120px;background:#f4f7ff;border-radius:8px;padding:10px 12px;font-size:.83rem}
+.score-item strong{display:block;color:#0d2b5e;font-size:1.1rem}
+
+/* ===== PRINT ===== */
+@media print{
+  body{background:#fff!important;font-size:11pt}
+  #login-wrap{display:none!important}
+  #main-wrap{display:block!important;max-width:100%;padding:0}
+  .top-bar{background:#0d2b5e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff!important;border-radius:0;padding:12px 18px}
+  .progress-wrap,.btn-print,.bh-arrow{display:none!important}
+  .block{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;margin-bottom:10px}
+  .bh{background:#e8edf8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bb{display:block!important}
+  .bh-num{background:#0d2b5e!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tcb{border:1px solid #ccc;min-height:60px;background:#fafafa!important}
+  .lab-table th{background:#0d2b5e!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ti{background:#e8edf8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  a{color:#000}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-wrap">
+  <div class="login-card">
+    <h1>Практическое занятие<br>«ИИ и нейросети в здравоохранении»</h1>
+    <p class="subtitle">Информационные технологии в здравоохранении · 1 курс · 4 ак. часа</p>
+    <label>Фамилия Имя Отчество</label>
+    <input id="inp-name" type="text" placeholder="Иванов Иван Иванович" autocomplete="off">
+    <label>Номер учебной группы</label>
+    <input id="inp-group" type="text" placeholder="101" autocomplete="off">
+    <label>Дата занятия</label>
+    <input id="inp-date" type="date">
+    <button class="btn-start" onclick="startWork()">Начать работу</button>
+    <p class="login-note">Вариант назначается автоматически по вашим данным и не изменяется при повторном входе</p>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-wrap">
+  <div class="top-bar">
+    <div>
+      <div id="top-specialty" style="font-size:.8rem;opacity:.8;margin-bottom:2px"></div>
+      <h1>Практическое занятие: ИИ и нейросети в медицине</h1>
+    </div>
+    <div class="variant-badge" id="top-variant">Вариант —</div>
+    <div class="student-info" id="top-student"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Прогресс выполнения</span><span id="prog-text">0 / 18 заданий</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- BLOCK 1 -->
+  <div class="block open" id="b1">
+    <div class="bh" onclick="toggleBlock('b1')">
+      <div class="bh-num">1</div>
+      <div class="bh-title">Знакомство с нейросетями</div>
+      <div class="bh-time">⏱ 25 мин</div>
+      <div class="bh-arrow">▼</div>
+    </div>
+    <div class="bb">
+      <div class="info-box">Откройте нейросеть, доступную на вашем устройстве (ChatGPT, GigaChat, YandexGPT или другую). Все ответы нейросети копируйте или кратко конспектируйте в поле для ответа.</div>
+
+      <div class="ti">📌 Задание 1.1. Сравнение запросов</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Задайте нейросети два запроса ниже и сравните качество ответов:</p>
+      <div class="pb2"><strong>Простой запрос (скопируйте в чат):</strong><code id="b1-fakesimple"></code></div>
+      <div class="pt"><strong>Детализированный запрос (скопируйте в чат):</strong><code id="b1-detailed"></code></div>
+      <div class="ti">✍ Ваш ответ: чем различались ответы? Какой оказался полезнее и почему?</div>
+      <textarea class="tcb" id="t1_1" placeholder="Опишите разницу в ответах нейросети..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 1.2. Проверка на галлюцинации</div>
+      <div class="warn-box">Задайте нейросети вопрос о несуществующем синдроме: <br><strong>«Опишите клиническую картину и диагностические критерии <span id="b1-fake-syndrome">синдрома Штейн-Вейссмана</span>»</strong></div>
+      <div class="ti">✍ Что ответила нейросеть? Признала ли она, что такого синдрома не существует, или сочинила описание?</div>
+      <textarea class="tcb" id="t1_2" placeholder="Скопируйте или перескажите ответ нейросети..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 1.3. Контекст диалога</div>
+      <p style="font-size:.87rem;margin-bottom:8px">В том же чате задайте уточняющий вопрос: <em>«А если бы этот синдром существовал — каким бы был прогноз?»</em></p>
+      <div class="ti">✍ Как нейросеть отреагировала на уточнение? Удержала ли контекст разговора?</div>
+      <textarea class="tcb" id="t1_3" placeholder="Ваш анализ поведения нейросети..." onchange="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 2 -->
+  <div class="block" id="b2">
+    <div class="bh" onclick="toggleBlock('b2')">
+      <div class="bh-num">2</div>
+      <div class="bh-title">Промптинг и управление запросами</div>
+      <div class="bh-time">⏱ 45 мин</div>
+      <div class="bh-arrow">▼</div>
+    </div>
+    <div class="bb">
+      <div class="info-box">Промпт (prompt) — это запрос к нейросети. Качество промпта напрямую определяет качество ответа. В этом блоке вы изучите три техники.</div>
+
+      <div class="ti">📌 Задание 2.1. Ролевая инструкция (Role Prompting)</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Задайте нейросети запрос по теме вашего варианта, начав с ролевой инструкции:</p>
+      <div class="pt"><strong>Пример ролевого запроса для вашей темы:</strong><code id="b2-role"></code></div>
+      <div class="ti">✍ Как изменился ответ по сравнению с обычным запросом? Стал ли он более специализированным?</div>
+      <textarea class="tcb" id="t2_1" placeholder="Опишите результат..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 2.2. Пошаговое мышление (Chain-of-Thought)</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Добавьте к любому медицинскому вопросу фразу: <em>«Объясни своё мышление шаг за шагом, прежде чем дать ответ»</em></p>
+      <div class="ti">✍ Какую структуру рассуждений использовала нейросеть? Совпадает ли это с клиническим алгоритмом?</div>
+      <textarea class="tcb" id="t2_2" placeholder="Опишите структуру ответа..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 2.3. Напишите собственный промпт</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Составьте промпт по теме <strong id="b2-theme-label"></strong>. Используйте хотя бы одну из изученных техник.</p>
+      <div class="ti">✍ Ваш промпт (напишите здесь, затем проверьте в нейросети):</div>
+      <textarea class="tcb" id="t2_3a" placeholder="Ваш промпт..." onchange="updateProgress()"></textarea>
+      <div class="ti">✍ Результат — краткое резюме ответа нейросети:</div>
+      <textarea class="tcb" id="t2_3b" placeholder="Краткое резюме ответа..." onchange="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 3 -->
+  <div class="block" id="b3">
+    <div class="bh" onclick="toggleBlock('b3')">
+      <div class="bh-num">3</div>
+      <div class="bh-title">ИИ в клинической диагностике</div>
+      <div class="bh-time">⏱ 50 мин</div>
+      <div class="bh-arrow">▼</div>
+    </div>
+    <div class="bb">
+      <div class="clin-box">
+        <strong>🩺 Ваш клинический случай (Вариант <span id="b3-vnum"></span>):</strong>
+        <p id="b3-case" style="margin-top:8px"></p>
+      </div>
+
+      <div style="margin:12px 0 8px;font-weight:700;color:#0d2b5e;font-size:.9rem">📊 Лабораторные и инструментальные данные:</div>
+      <table class="lab-table">
+        <thead><tr><th>Показатель</th><th>Значение</th><th>Интерпретация</th></tr></thead>
+        <tbody id="b3-lab"></tbody>
+      </table>
+
+      <div class="ti">📌 Задание 3.1. Анализ клинического случая с ИИ</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Используйте детализированный промпт из Блока 1 (или составьте новый). Задайте нейросети клинический случай вашего варианта.</p>
+      <div class="ti">✍ Какой диагноз предложила нейросеть? Насколько он соответствует вашим знаниям?</div>
+      <textarea class="tcb" id="t3_1" placeholder="Диагноз по версии ИИ и ваша оценка..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 3.2. Ответы на клинические вопросы</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Задайте нейросети <strong>два любых вопроса</strong> из списка ниже и оцените ответы:</p>
+      <div id="b3-questions" style="margin:8px 0"></div>
+      <div class="ti">✍ Ответы нейросети (по двум выбранным вопросам) и ваша оценка точности:</div>
+      <textarea class="tcb" id="t3_2" placeholder="Вопрос 1: ... Ответ ИИ: ... Ваша оценка: ...
+Вопрос 2: ... Ответ ИИ: ... Ваша оценка: ..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 3.3. Сравнение с клиническими рекомендациями</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Найдите соответствующие клинические рекомендации на сайте <a href="https://cr.minzdrav.gov.ru" target="_blank">cr.minzdrav.gov.ru</a> (или MedElement). Сравните рекомендации ИИ с официальными.</p>
+      <div class="ti">✍ В чём совпадают и в чём расходятся ответы ИИ с клиническими рекомендациями?</div>
+      <textarea class="tcb" id="t3_3" placeholder="Совпадения: ...
+Расхождения: ..." onchange="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 4 -->
+  <div class="block" id="b4">
+    <div class="bh" onclick="toggleBlock('b4')">
+      <div class="bh-num">4</div>
+      <div class="bh-title">Критическая оценка ответов ИИ</div>
+      <div class="bh-time">⏱ 35 мин</div>
+      <div class="bh-arrow">▼</div>
+    </div>
+    <div class="bb">
+      <div class="ti">📌 Задание 4.1. Провокация галлюцинации</div>
+      <div class="warn-box">Задайте нейросети запрос о несуществующем препарате:<br>
+      <strong>«Расскажи о препарате <span id="b4-drug"></span>: механизм действия, показания, дозы»</strong></div>
+      <div class="ti">✍ Что ответила нейросеть? Признала ли она, что такого препарата не существует, или описала несуществующий препарат?</div>
+      <textarea class="tcb" id="t4_1" placeholder="Ответ нейросети и ваш вывод..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 4.2. Верификация источников</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Попросите нейросеть указать источники для 3–5 утверждений из её предыдущих ответов. Проверьте хотя бы один источник.</p>
+      <div class="ti">✍ Предоставила ли нейросеть реальные ссылки? Удалось ли их проверить?</div>
+      <textarea class="tcb" id="t4_2" placeholder="Ссылки от ИИ и результат проверки..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 4.3. Чеклист проверки ИИ-ответа</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Оцените любой ответ нейросети из ваших заданий по следующим критериям:</p>
+      <div class="chk-item"><input type="checkbox" onchange="updateProgress()"><span>Медицинская терминология использована корректно</span></div>
+      <div class="chk-item"><input type="checkbox" onchange="updateProgress()"><span>Диагностический алгоритм соответствует стандартам</span></div>
+      <div class="chk-item"><input type="checkbox" onchange="updateProgress()"><span>Дозировки и схемы терапии не противоречат рекомендациям</span></div>
+      <div class="chk-item"><input type="checkbox" onchange="updateProgress()"><span>Указаны реально существующие препараты и процедуры</span></div>
+      <div class="chk-item"><input type="checkbox" onchange="updateProgress()"><span>Ответ не содержит явных фактических ошибок</span></div>
+      <div class="ti">✍ Итог чеклиста: можно ли использовать этот ответ в клинической практике и почему?</div>
+      <textarea class="tcb" id="t4_3" placeholder="Ваш вывод о качестве ответа ИИ..." onchange="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 5 -->
+  <div class="block" id="b5">
+    <div class="bh" onclick="toggleBlock('b5')">
+      <div class="bh-num">5</div>
+      <div class="bh-title">Итоговое задание и рефлексия</div>
+      <div class="bh-time">⏱ 15 мин</div>
+      <div class="bh-arrow">▼</div>
+    </div>
+    <div class="bb">
+      <div class="ti">📌 Задание 5.1. Итоговый промпт</div>
+      <p style="font-size:.87rem;margin-bottom:8px">Составьте финальный профессиональный промпт, объединив всё изученное: ролевую инструкцию, контекст клинического случая, конкретный вопрос и требование обоснования с источниками.</p>
+      <div class="ti">✍ Ваш итоговый промпт:</div>
+      <textarea class="tcb" id="t5_1" placeholder="Ваш лучший промпт..." onchange="updateProgress()"></textarea>
+      <div class="ti">✍ Краткое резюме ответа нейросети:</div>
+      <textarea class="tcb" id="t5_1b" placeholder="Резюме..." onchange="updateProgress()"></textarea>
+
+      <div class="ti">📌 Задание 5.2. Рефлексия</div>
+      <div class="ti">✍ Что вас удивило в поведении нейросети сегодня?</div>
+      <textarea class="tcb" id="t5_2a" placeholder="Ваши наблюдения..." onchange="updateProgress()"></textarea>
+      <div class="ti">✍ В каких клинических ситуациях ИИ может быть полезен, а где его применение опасно?</div>
+      <textarea class="tcb" id="t5_2b" placeholder="Ваш анализ..." onchange="updateProgress()"></textarea>
+
+      <div style="margin:18px 0 10px;font-weight:700;color:#0d2b5e;font-size:.97rem">📋 Критерии оценки</div>
+      <table class="cr-table">
+        <thead><tr><th>Критерий</th><th>Баллы</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td>Блок 1: Знакомство с ИИ</td><td>2</td><td>Все 3 задания выполнены, ответы содержательны</td></tr>
+          <tr><td>Блок 2: Промптинг</td><td>2</td><td>Применены не менее 2 техник, составлен собственный промпт</td></tr>
+          <tr><td>Блок 3: Клинический случай</td><td>3</td><td>Анализ случая, сравнение с КР, критическая оценка</td></tr>
+          <tr><td>Блок 4: Критика ИИ</td><td>2</td><td>Обнаружена галлюцинация, проверены источники, заполнен чеклист</td></tr>
+          <tr><td>Блок 5: Рефлексия</td><td>1</td><td>Сформулированы выводы о применении ИИ в медицине</td></tr>
+        </tbody>
+      </table>
+      <div class="score-box">
+        <div class="score-item"><strong>10 баллов</strong>Максимум</div>
+        <div class="score-item"><strong>≥ 6 баллов</strong>Зачёт</div>
+        <div class="score-item"><strong>< 6 баллов</strong>Незачёт</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-print" onclick="window.print()">🖨 Распечатать / Сохранить PDF</button>
+</div>
+
+<script>
+const VARIANTS = [{"id": 1, "specialty": "Кардиология", "title": "Острый коронарный синдром с подъёмом ST", "clinCase": "Пациент М., 58 лет, доставлен СМП с жалобами на давящую боль за грудиной, иррадиирующую в левую руку, продолжительностью 40 минут. АД 90/60 мм рт.ст., ЧСС 110 уд/мин. На ЭКГ — подъём ST в отведениях II, III, aVF.", "clinQ": ["Какой предварительный диагноз наиболее вероятен и почему?", "Какие лабораторные маркеры необходимо определить в первую очередь?", "Какова тактика ведения пациента в первые 90 минут?", "Какие ограничения имеет ИИ при интерпретации ЭКГ в экстренной ситуации?"], "lab": [["Тропонин I", "18,4 нг/мл", "↑↑ (N < 0,04)"], ["КФК-МВ", "67 Ед/л", "↑↑ (N < 25)"], ["Глюкоза", "9,2 ммоль/л", "↑"], ["Калий", "3,4 ммоль/л", "N (3,5–5,0)"], ["Креатинин", "104 мкмоль/л", "N"]], "promptTheme": "Интерпретация ЭКГ и тактика при ОКС", "simple": "Что делать при инфаркте миокарда?", "detailed": "Пациент 58 лет, давящая боль за грудиной 40 минут, иррадиация в левую руку, АД 90/60, ЧСС 110, подъём ST в II, III, aVF, тропонин I 18,4 нг/мл. Действуй как кардиолог реанимационного отделения: сформулируй предварительный диагноз, объясни патофизиологию подъёма ST при нижнем ИМ, перечисли неотложные мероприятия в хронологическом порядке (первые 10/30/90 минут), укажи целевые показатели гемодинамики и критерии направления на экстренное ЧКВ.", "hallDrug": "Нейроспектрин-Б", "fakeSyndrome": "синдрома Штейн-Вейссмана", "fakeSimple": "Какие симптомы бывают при болезнях сердца?"}, {"id": 2, "specialty": "Эндокринология", "title": "Тиреотоксикоз", "clinCase": "Пациентка Д., 34 года, жалобы на похудание на 8 кг за 2 месяца, сердцебиение, раздражительность, потливость, дрожь в руках. При осмотре: экзофтальм, диффузное увеличение щитовидной железы II степени, ЧСС 118 уд/мин.", "clinQ": ["Какой синдром описан и каков наиболее вероятный диагноз?", "Какие гормональные показатели необходимо исследовать и как интерпретировать результаты?", "Каковы принципы лечения болезни Грейвса?", "Как ИИ может ошибиться при дифференциальной диагностике заболеваний щитовидной железы?"], "lab": [["ТТГ", "0,01 мЕд/л", "↓↓ (N 0,4–4,0)"], ["Св. Т4", "38,2 пмоль/л", "↑↑ (N 9–20)"], ["Св. Т3", "12,1 пмоль/л", "↑↑ (N 2,6–5,7)"], ["АТ-рТТГ", "18,3 МЕд/л", "↑↑ (N < 1,75)"], ["Глюкоза", "6,1 ммоль/л", "N"]], "promptTheme": "Дифференциальная диагностика тиреотоксикоза", "simple": "Что такое тиреотоксикоз и как его лечить?", "detailed": "Пациентка 34 лет, потеря 8 кг за 2 месяца, ЧСС 118, экзофтальм, диффузный зоб II ст., ТТГ 0,01, св.Т4 38,2, АТ-рТТГ 18,3. Действуй как эндокринолог: установи диагноз по критериям, объясни патогенез аутоиммунного тиреотоксикоза, сравни три метода лечения болезни Грейвса (тиреостатики/радиойод/операция) с указанием показаний, противопоказаний и ожидаемых сроков эутиреоза.", "hallDrug": "Тиреозол-Д Плюс", "fakeSyndrome": "синдрома Мюллер-Хартманна", "fakeSimple": "Почему щитовидная железа влияет на вес?"}, {"id": 3, "specialty": "Пульмонология", "title": "Внебольничная пневмония", "clinCase": "Пациент К., 45 лет, температура 39,2°C, кашель с ржавой мокротой, одышка (ЧДД 26/мин), боль в правом боку при дыхании. SpO₂ 91%. На рентгенограмме — инфильтрат в нижней доле правого лёгкого.", "clinQ": ["Сформулируйте клинический диагноз с указанием степени тяжести по шкале CRB-65.", "Какова вероятная этиология и эмпирическая антибактериальная терапия?", "Какие критерии госпитализации в ОРИТ при пневмонии?", "Каковы риски использования ИИ для интерпретации рентгенограмм лёгких?"], "lab": [["Лейкоциты", "18,4 × 10⁹/л", "↑↑ (N 4–9)"], ["СРБ", "187 мг/л", "↑↑ (N < 5)"], ["ПКТ", "1,8 нг/мл", "↑ (N < 0,5)"], ["SpO₂", "91%", "↓ (N > 95%)"], ["Фибриноген", "6,8 г/л", "↑ (N 2–4)"]], "promptTheme": "Оценка тяжести и выбор терапии при пневмонии", "simple": "Как лечить пневмонию?", "detailed": "Пациент 45 лет, t° 39,2°C, ЧДД 26, SpO₂ 91%, ржавая мокрота, инфильтрат нижней доли правого лёгкого, лейкоциты 18,4, СРБ 187. Действуй как пульмонолог: рассчитай баллы CRB-65, обоснуй место лечения, выбери эмпирическую антибиотикотерапию согласно российским клиническим рекомендациям, укажи критерии перевода в ОРИТ и целевые показатели оксигенации.", "hallDrug": "Респираксол-Н", "fakeSyndrome": "синдрома Бреннера-Фольке", "fakeSimple": "Как понять, что у человека воспаление лёгких?"}, {"id": 4, "specialty": "Гастроэнтерология", "title": "Желчнокаменная болезнь, острый холецистит", "clinCase": "Пациентка Е., 52 года, острая боль в правом подреберье после жирной еды, иррадиация в правое плечо, тошнота, рвота. Температура 38,1°C. Симптом Мёрфи положительный. УЗИ: камни в желчном пузыре, утолщение стенки до 6 мм.", "clinQ": ["Сформулируйте диагноз и обоснуйте его на основании клинической картины.", "Какова дифференциальная диагностика болей в правом подреберье?", "Каковы показания к экстренному и плановому хирургическому лечению?", "Как ИИ может помочь и где может ошибиться при анализе данных УЗИ брюшной полости?"], "lab": [["Лейкоциты", "13,8 × 10⁹/л", "↑ (N 4–9)"], ["Билирубин общ.", "28,4 мкмоль/л", "↑ (N < 21)"], ["АЛТ", "78 Ед/л", "↑ (N < 40)"], ["ЩФ", "210 Ед/л", "↑ (N < 130)"], ["Амилаза", "68 Ед/л", "N (< 100)"]], "promptTheme": "Дифференциальная диагностика острого живота", "simple": "Что такое желчнокаменная болезнь и нужна ли операция?", "detailed": "Пациентка 52 лет, острая боль в ПП после жирной еды, иррадиация в плечо, t° 38,1°C, симптом Мёрфи+, УЗИ — камни, стенка 6 мм, билирубин 28, АЛТ 78, ЩФ 210. Действуй как гастроэнтеролог-хирург: сформулируй диагноз по Токийским критериям 2018 г., проведи дифдиагностику с панкреатитом и холедохолитиазом, определи тактику (консервативная/экстренная операция), обоснуй сроки вмешательства.", "hallDrug": "Холеспазмин-Р", "fakeSyndrome": "синдрома Краузе-Дитриха", "fakeSimple": "Почему болит правый бок после еды?"}, {"id": 5, "specialty": "Неврология", "title": "Ишемический инсульт", "clinCase": "Пациент В., 67 лет, внезапно развилась слабость в правых конечностях, нарушение речи (моторная афазия), асимметрия лица. Симптомы появились 1,5 часа назад. АД 170/100 мм рт.ст. По шкале NIHSS — 12 баллов.", "clinQ": ["Какой диагноз наиболее вероятен? Обоснуйте по критериям FAST.", "Каковы показания и противопоказания к тромболитической терапии?", "Какие нейровизуализационные исследования необходимы и в какие сроки?", "Каковы возможности и ограничения ИИ в диагностике инсульта по КТ-изображениям?"], "lab": [["Глюкоза", "7,4 ммоль/л", "↑ (N 3,9–6,1)"], ["МНО", "1,1", "N (0,8–1,2)"], ["Тромбоциты", "224 × 10⁹/л", "N"], ["Фибриноген", "4,1 г/л", "↑ (N 2–4)"], ["Холестерин", "6,8 ммоль/л", "↑ (N < 5,2)"]], "promptTheme": "Диагностика и тактика при остром инсульте", "simple": "Что делать при инсульте?", "detailed": "Пациент 67 лет, правосторонняя гемиплегия + моторная афазия + асимметрия лица, давность 1,5 часа, АД 170/100, NIHSS 12 баллов, глюкоза 7,4, МНО 1,1. Действуй как невролог инсультного центра: подтверди диагноз по FAST и NIHSS, оцени «терапевтическое окно» для тромболизиса, укажи абсолютные противопоказания, опиши алгоритм нейровизуализации и реперфузионной терапии согласно российским рекомендациям 2023 г.", "hallDrug": "Нейроспектрин-Б", "fakeSyndrome": "синдрома Вайс-Хольцера", "fakeSimple": "Как распознать инсульт у человека?"}, {"id": 6, "specialty": "Нефрология", "title": "Хроническая болезнь почек на фоне сахарного диабета", "clinCase": "Пациентка Т., 61 год, СД 2 типа 15 лет. Жалобы на отёки ног, слабость, снижение диуреза. АД 158/96. Протеинурия 3,8 г/сут. Размеры почек по УЗИ — уменьшены.", "clinQ": ["Определите стадию ХБП и степень альбуминурии по классификации KDIGO.", "Каковы основные механизмы прогрессирования диабетической нефропатии?", "Какова цель-ориентированная терапия при ХБП + СД 2?", "Как ИИ используется для прогнозирования прогрессии ХБП и каковы его ограничения?"], "lab": [["Креатинин", "248 мкмоль/л", "↑↑ (N < 110)"], ["СКФ (CKD-EPI)", "22 мл/мин/1,73м²", "↓↓ (G4)"], ["Калий", "5,6 ммоль/л", "↑ (N 3,5–5,0)"], ["Гемоглобин", "98 г/л", "↓ (N > 120)"], ["Альбумин", "28 г/л", "↓ (N 35–52)"]], "promptTheme": "Стадирование и лечение хронической болезни почек", "simple": "Что такое хроническая болезнь почек при диабете?", "detailed": "Пациентка 61 год, СД 2 типа 15 лет, АД 158/96, протеинурия 3,8 г/сут, крeatинин 248, СКФ 22, калий 5,6, Hb 98. Действуй как нефролог: определи стадию ХБП и категорию риска по KDIGO 2022, объясни патогенез диабетической нефропатии, назначь комплексную нефропротективную терапию (иАПФ/БРА, SGLT2, ГПП-1), укажи показания к заместительной почечной терапии.", "hallDrug": "Ренаспект-Форте", "fakeSyndrome": "синдрома Лерман-Покровского", "fakeSimple": "Чем опасна почечная недостаточность при диабете?"}, {"id": 7, "specialty": "Гематология", "title": "Железодефицитная анемия", "clinCase": "Пациентка А., 28 лет, жалобы на слабость, головокружение, ломкость ногтей, извращение вкуса (хочет есть мел). Меноррагия в течение 2 лет. Кожа бледная, ЧСС 98 уд/мин.", "clinQ": ["Сформулируйте диагноз и определите степень тяжести анемии.", "Как дифференцировать железодефицитную анемию от других гипохромных анемий?", "Каковы принципы лечения ЖДА и критерии эффективности терапии?", "Как ИИ анализирует общий анализ крови и где возможны диагностические ошибки?"], "lab": [["Гемоглобин", "78 г/л", "↓↓ (N > 120)"], ["MCV", "62 фл", "↓ (N 80–100)"], ["Сывороточное железо", "4,2 мкмоль/л", "↓↓ (N 9–30)"], ["Ферритин", "6 нг/мл", "↓↓ (N 12–150)"], ["ОЖСС", "94 мкмоль/л", "↑↑ (N 45–75)"]], "promptTheme": "Диагностика и лечение железодефицитной анемии", "simple": "Что такое анемия и как её лечить?", "detailed": "Пациентка 28 лет, меноррагия 2 года, Hb 78 г/л, MCV 62 фл, железо 4,2, ферритин 6, ОЖСС 94, извращение вкуса, бледность. Действуй как гематолог: подтверди диагноз ЖДА, определи степень тяжести, проведи дифдиагностику с талассемией и анемией хронических заболеваний, назначь терапию препаратами железа с расчётом дозы, укажи критерии ретикулоцитарного криза и длительность курса.", "hallDrug": "Феррокомплекс-Ультра", "fakeSyndrome": "синдрома Гартнера-Блюма", "fakeSimple": "Почему кружится голова при малокровии?"}, {"id": 8, "specialty": "Ревматология", "title": "Ревматоидный артрит", "clinCase": "Пациентка П., 42 года, симметричный артрит мелких суставов кистей и стоп в течение 8 месяцев, утренняя скованность более 1 часа, общая слабость. Деформация суставов не выражена. DAS28 = 5,4.", "clinQ": ["Сформулируйте диагноз по критериям ACR/EULAR 2010.", "Какова современная стратегия «Лечение до цели» (Treat-to-Target) при РА?", "Какие БПВП являются препаратами первой линии и каков их механизм действия?", "Каковы возможности ИИ для прогнозирования ответа на терапию при РА?"], "lab": [["РФ", "128 МЕ/мл", "↑↑ (N < 14)"], ["АЦЦП", "320 Ед/мл", "↑↑ (N < 17)"], ["СОЭ", "54 мм/ч", "↑↑ (N < 20)"], ["СРБ", "38 мг/л", "↑↑ (N < 5)"], ["Гемоглобин", "108 г/л", "↓ (N > 120)"]], "promptTheme": "Стратегия лечения ревматоидного артрита", "simple": "Что такое ревматоидный артрит и как его лечат?", "detailed": "Пациентка 42 лет, симметричный полиартрит мелких суставов 8 месяцев, утренняя скованность > 1 ч, DAS28 5,4, РФ 128, АЦЦП 320, СОЭ 54, СРБ 38. Действуй как ревматолог: верифицируй диагноз по ACR/EULAR 2010 (подсчитай баллы), определи активность заболевания, выбери стратегию Treat-to-Target, назначь БПВП первой линии с обоснованием и мониторингом безопасности.", "hallDrug": "Артрозилин-М", "fakeSyndrome": "синдрома Эйхенберга", "fakeSimple": "Что такое артрит суставов и как его лечат?"}, {"id": 9, "specialty": "Инфекционные болезни", "title": "Бактериальный менингит", "clinCase": "Пациент С., 19 лет, студент, острое начало: температура 40°C, интенсивная головная боль, рвота, светобоязнь, ригидность затылочных мышц, петехиальная сыпь на коже.", "clinQ": ["Поставьте предварительный диагноз и обоснуйте неотложность ситуации.", "Каков алгоритм обследования при подозрении на менингит?", "Какова эмпирическая антибактериальная терапия менингита у молодого пациента?", "Каковы риски использования ИИ для оценки тяжести нейроинфекций?"], "lab": [["Лейкоциты", "22,6 × 10⁹/л", "↑↑ (N 4–9)"], ["ПКТ", "38,4 нг/мл", "↑↑↑ (N < 0,5)"], ["СРБ", "214 мг/л", "↑↑ (N < 5)"], ["Глюкоза крови", "4,8 ммоль/л", "N"], ["Натрий", "128 ммоль/л", "↓ (N 136–145)"]], "promptTheme": "Неотложная помощь при менингите", "simple": "Что такое менингит и насколько он опасен?", "detailed": "Пациент 19 лет, t° 40°C, менингеальный синдром, петехиальная сыпь, лейкоциты 22,6, ПКТ 38,4, СРБ 214, гипонатриемия 128. Действуй как инфекционист ОРИТ: поставь диагноз с оценкой вероятного возбудителя по эпидемиологии и возрасту, определи объём экстренных мероприятий (до и после люмбальной пункции), назначь эмпирическую терапию с расчётом доз, укажи критерии перевода на ИВЛ.", "hallDrug": "Менингоцефазол-В", "fakeSyndrome": "синдрома Тауберта-Мэннинга", "fakeSimple": "Чем опасен менингит и как быстро он развивается?"}, {"id": 10, "specialty": "Акушерство", "title": "Преэклампсия тяжёлой степени", "clinCase": "Пациентка Н., 31 год, беременность 34 недели. АД 165/110 мм рт.ст., головная боль, мелькание мушек перед глазами, отёки лица и рук. Суточная протеинурия 3,2 г.", "clinQ": ["Сформулируйте диагноз и определите степень тяжести преэклампсии.", "Каковы критерии экстренного родоразрешения при преэклампсии?", "Какова медикаментозная тактика (антигипертензивная + магниевая терапия)?", "Как ИИ используется для прогнозирования рисков преэклампсии и каковы его ограничения?"], "lab": [["АД", "165/110 мм рт.ст.", "↑↑ (критич.)"], ["Протеинурия", "3,2 г/сут", "↑↑↑ (N < 0,3)"], ["Тромбоциты", "98 × 10⁹/л", "↓ (N > 150)"], ["АЛТ", "112 Ед/л", "↑↑ (N < 40)"], ["Креатинин", "118 мкмоль/л", "↑ (N < 90)"]], "promptTheme": "Тактика при тяжёлой преэклампсии", "simple": "Что такое преэклампсия при беременности?", "detailed": "Беременность 34 недели, АД 165/110, суточная протеинурия 3,2 г, тромбоциты 98, АЛТ 112, головная боль, фотопсии. Действуй как акушер-гинеколог перинатального центра: верифицируй диагноз по критериям ISSHP/ACOG, оцени признаки тяжёлой преэклампсии и угрозу HELLP-синдрома, определи тактику ведения (пролонгирование vs родоразрешение), назначь сульфат магния и антигипертензивную терапию с расчётом доз.", "hallDrug": "Гестозин-Экстра", "fakeSyndrome": "синдрома Фишер-Ламберт", "fakeSimple": "Что такое гестоз при беременности?"}, {"id": 11, "specialty": "Педиатрия", "title": "Острый стенозирующий ларинготрахеит (круп)", "clinCase": "Ребёнок И., 2 года, ночью появился грубый «лающий» кашель, инспираторная одышка, осиплость голоса. Температура 37,8°C. ЧДД 36/мин, SpO₂ 93%. Ребёнок возбуждён, кожа бледная.", "clinQ": ["Оцените степень стеноза по шкале Уэстли и сформулируйте диагноз.", "Какова дифференциальная диагностика синдрома крупа у детей раннего возраста?", "Каков алгоритм неотложной помощи при стенозирующем ларинготрахеите II степени?", "Каковы особенности использования ИИ в педиатрической практике и его ограничения?"], "lab": [["SpO₂", "93%", "↓↓ (N > 95%)"], ["ЧДД", "36/мин", "↑↑ (N 20–30)"], ["Лейкоциты", "11,2 × 10⁹/л", "↑ (N 6–12)"], ["Лимфоциты", "68%", "↑ (N 25–50)"], ["СРБ", "12 мг/л", "↑ (N < 5)"]], "promptTheme": "Неотложная помощь при крупе у детей", "simple": "Что делать, если у ребёнка лающий кашель и затрудненное дыхание?", "detailed": "Ребёнок 2 лет, ночной лающий кашель + инспираторная одышка + осиплость, t° 37,8°C, ЧДД 36, SpO₂ 93%, возбуждение, бледность. Действуй как педиатр скорой помощи: оцени стеноз по шкале Уэстли (подсчитай баллы), проведи дифдиагностику с эпиглоттитом и инородным телом, назначь ингаляционный адреналин и системные ГКС с расчётом доз по весу (12 кг), определи показания к госпитализации в ОРИТ.", "hallDrug": "Ларинголайт-Д", "fakeSyndrome": "синдрома Бауэра-Клемма", "fakeSimple": "Почему у ребёнка может быть лающий кашель ночью?"}, {"id": 12, "specialty": "Хирургия", "title": "Острый аппендицит", "clinCase": "Пациент О., 23 года, боль в правой подвздошной области, начавшаяся около пупка и сместившаяся в ПОО через 6 часов, тошнота, однократная рвота. Температура 37,6°C. Симптом Щёткина-Блюмберга положительный в ПОО.", "clinQ": ["Сформулируйте диагноз и оцените вероятность по шкале Альварадо.", "Какова дифференциальная диагностика болей в правой подвздошной области?", "Каковы показания к лапароскопической и открытой аппендэктомии?", "Как ИИ применяется для анализа КТ брюшной полости при подозрении на аппендицит?"], "lab": [["Лейкоциты", "14,6 × 10⁹/л", "↑↑ (N 4–9)"], ["Нейтрофилы", "88%", "↑↑ (N 47–72%)"], ["СРБ", "76 мг/л", "↑↑ (N < 5)"], ["Температура", "37,6°C", "↑ субфебр."], ["Амилаза", "54 Ед/л", "N (< 100)"]], "promptTheme": "Диагностика острого аппендицита", "simple": "Как понять, что у пациента аппендицит?", "detailed": "Пациент 23 лет, классическая миграция боли + симптом Щёткина-Блюмберга в ПОО, лейкоциты 14,6, нейтрофилы 88%, СРБ 76, t° 37,6°C. Действуй как хирург приёмного отделения: подсчитай шкалу Альварадо, проведи дифдиагностику с мезаденитом и болезнью Крона, определи показания к экстренному вмешательству, сравни лапароскопический и открытый доступы, укажи риски перфорации при задержке операции.", "hallDrug": "Аппендоцефин-Б", "fakeSyndrome": "синдрома Розенфельда-Кранца", "fakeSimple": "Как понять, что боль в животе требует операции?"}, {"id": 13, "specialty": "Дерматология", "title": "Меланома кожи", "clinCase": "Пациентка Л., 47 лет, обратилась в связи с изменением пигментного невуса на спине: за последние 3 месяца невус увеличился, края стали неровными, появилась пёстрая окраска. Размер 12 × 9 мм. Кровоточивость при травматизации.", "clinQ": ["Оцените новообразование по критериям ABCDE и сформулируйте диагноз.", "Какова тактика при подозрении на меланому (эксцизионная биопсия vs другие методы)?", "Что такое индекс Бреслоу и как он влияет на прогноз и лечение?", "Каковы возможности и ограничения ИИ-систем для дерматоскопической диагностики меланомы?"], "lab": [["Критерий A", "Асимметрия", "↑ (патол.)"], ["Критерий B", "Неровные края", "↑ (патол.)"], ["Критерий C", "Неоднородная окраска", "↑ (патол.)"], ["Критерий D", "Диаметр 12 мм", "↑↑ (N < 6 мм)"], ["Критерий E", "Рост + кровоточивость", "↑↑ (патол.)"]], "promptTheme": "Дерматоскопическая диагностика меланомы", "simple": "Как отличить родинку от меланомы?", "detailed": "Пигментное образование 12×9 мм на спине, 47 лет, асимметрия + неровные края + пёстрая окраска + рост за 3 месяца + кровоточивость. Действуй как дерматоонколог: применяй критерии ABCDE и правило «гадкого утёнка», определи объём биопсии, объясни патогистологические критерии меланомы (индекс Бреслоу, уровень инвазии по Кларку), опиши хирургическую тактику и показания к биопсии сторожевого лимфоузла.", "hallDrug": "Меланонил-С", "fakeSyndrome": "синдрома Штраус-Вебера", "fakeSimple": "Как отличить опасную родинку от обычной?"}, {"id": 14, "specialty": "Психиатрия", "title": "Маниакальный эпизод", "clinCase": "Пациент Р., 26 лет, доставлен родственниками. 2 недели практически не спит (2–3 часа), очень активен, говорит без остановки, строит грандиозные планы, раздавал деньги незнакомым людям. Резко повышенное настроение, речь ускоренная, мышление — «скачка идей».", "clinQ": ["Сформулируйте диагноз по критериям МКБ-10 и оцените степень тяжести.", "Каков алгоритм дифференциальной диагностики мании с психотическими симптомами?", "Какова фармакотерапия маниакального эпизода (стабилизаторы настроения + антипсихотики)?", "Каковы особые риски использования ИИ-систем при взаимодействии с пациентами с психическими расстройствами?"], "lab": [["Сон", "2–3 ч/сут", "↓↓ (N 7–9 ч)"], ["Литий (если принимал)", "не определялся", "—"], ["ТТГ", "2,1 мЕд/л", "N (исключ. гипертиреоз)"], ["Глюкоза", "5,2 ммоль/л", "N"], ["Общ. анализ крови", "без патологии", "N"]], "promptTheme": "Диагностика и лечение маниакального эпизода", "simple": "Что такое мания и чем она отличается от хорошего настроения?", "detailed": "Пациент 26 лет, 2 недели: сон 2–3 ч, гипертимия, логорея, «скачка идей», расторможённость, трата денег. Действуй как психиатр: верифицируй маниакальный эпизод по МКБ-10/DSM-5, проведи дифдиагностику с гипоманией, шизофренией и интоксикацией, назначь комбинированную терапию (стабилизатор + антипсихотик), оцени необходимость госпитализации и возможность принудительного лечения.", "hallDrug": "Маниостаб-Р", "fakeSyndrome": "синдрома Хайнеке-Вольфа", "fakeSimple": "Чем мания отличается от просто хорошего настроения?"}, {"id": 15, "specialty": "Офтальмология", "title": "Диабетическая ретинопатия", "clinCase": "Пациент Г., 55 лет, СД 2 типа 12 лет. Жалобы на снижение остроты зрения обоих глаз, «мушки» перед глазами. Острота зрения OD 0,3, OS 0,4. При офтальмоскопии: микроаневризмы, экссудаты, неоваскуляризация диска зрительного нерва.", "clinQ": ["Определите стадию диабетической ретинопатии по классификации ETDRS.", "Каковы показания к лазерной коагуляции сетчатки и интравитреальным инъекциям?", "Какова взаимосвязь гликемического контроля и прогрессии ретинопатии?", "Каковы перспективы ИИ для скрининга диабетической ретинопатии по данным фундус-фотографии?"], "lab": [["HbA1c", "9,8%", "↑↑ (цель < 7,0%)"], ["Глюкоза натощак", "11,4 ммоль/л", "↑↑ (N < 6,1)"], ["АД", "148/94 мм рт.ст.", "↑ (цель < 130/80)"], ["Холестерин", "6,2 ммоль/л", "↑ (N < 5,2)"], ["Острота зрения OD", "0,3", "↓ (N 1,0)"]], "promptTheme": "Диагностика и лечение диабетической ретинопатии", "simple": "Как диабет влияет на зрение?", "detailed": "Пациент 55 лет, СД 2 типа 12 лет, HbA1c 9,8%, острота зрения 0,3/0,4, неоваскуляризация ДЗН, микроаневризмы, экссудаты. Действуй как офтальмолог: классифицируй ретинопатию по ETDRS (PDR vs NPDR), определи показания к панретинальной лазерной коагуляции и анти-VEGF терапии, объясни механизм неоваскуляризации при ишемии сетчатки, укажи кратность мониторинга и мультидисциплинарную тактику.", "hallDrug": "Ретиноспект-Д", "fakeSyndrome": "синдрома Крамера-Зоммера", "fakeSimple": "Как диабет влияет на зрение со временем?"}, {"id": 16, "specialty": "Онкология", "title": "Рак молочной железы (BI-RADS 4C)", "clinCase": "Пациентка Ж., 49 лет, при самообследовании обнаружила узел в наружном верхнем квадранте правой молочной железы. УЗИ: узел 18 мм, нечёткие края, BI-RADS 4C. Выделения из соска кровянистого характера.", "clinQ": ["Что означает категория BI-RADS 4C и какова тактика при этом заключении?", "Каков алгоритм диагностики при подозрении на рак молочной железы?", "Какие молекулярно-биологические подтипы РМЖ существуют и как они влияют на лечение?", "Каковы возможности ИИ для маммографического скрининга и какие этические проблемы возникают?"], "lab": [["BI-RADS", "4C (УЗИ)", "↑↑ (риск рака 60–95%)"], ["CA 15-3", "68 Ед/мл", "↑↑ (N < 31)"], ["CEA", "4,8 нг/мл", "↑ (N < 3,8)"], ["Гемоглобин", "118 г/л", "↓ (N > 120)"], ["Размер узла", "18 мм", "↑ (T1c)"]], "promptTheme": "Диагностический алгоритм при подозрении на РМЖ", "simple": "Что делать, если на УЗИ нашли узел в груди?", "detailed": "Пациентка 49 лет, узел 18 мм наружный верхний квадрант ПМЖ, BI-RADS 4C, кровянистые выделения из соска, CA 15-3 68. Действуй как онколог маммолог: объясни классификацию BI-RADS, назначь core-биопсию под УЗ-контролем, опиши молекулярные подтипы РМЖ (Luminal A/B, HER2+, ТНРМЖ) и их терапевтическое значение, изложи принципы мультидисциплинарного подхода.", "hallDrug": "Маммотаргет-Плюс", "fakeSyndrome": "синдрома Петерса-Нордхайма", "fakeSimple": "Что нужно делать при обнаружении шишки в молочной железе?"}, {"id": 17, "specialty": "Урология", "title": "ДГПЖ с повышенным ПСА", "clinCase": "Пациент Ф., 68 лет, жалобы на учащённое мочеиспускание, ночную поллакиурию (4–5 раз), ослабление струи мочи, ощущение неполного опорожнения мочевого пузыря. ПСА 9,4 нг/мл, IPSS = 22 балла.", "clinQ": ["Интерпретируйте значение ПСА 9,4 нг/мл и оцените необходимость биопсии простаты.", "Как по шкале IPSS оценить тяжесть симптомов нижних мочевыводящих путей?", "Каковы показания к консервативному и хирургическому лечению ДГПЖ?", "Как ИИ используется для анализа ПСА-кинетики и прогнозирования рака простаты?"], "lab": [["ПСА общий", "9,4 нг/мл", "↑↑ (N < 4,0)"], ["ПСА свободный/общий", "0,12", "↓ (риск ↑ при < 0,15)"], ["Объём простаты (УЗИ)", "68 мл", "↑↑ (N < 30)"], ["IPSS", "22 балла", "↑↑ (тяжёлые симптомы)"], ["Креатинин", "112 мкмоль/л", "N"]], "promptTheme": "Дифференциальная диагностика при повышенном ПСА", "simple": "Что значит высокий ПСА у мужчины?", "detailed": "Пациент 68 лет, IPSS 22, ПСА 9,4, свободный/общий ПСА 0,12, объём простаты 68 мл, ноктурия 4–5 р/ночь. Действуй как уролог: интерпретируй ПСА с учётом возрастных норм и соотношения свободный/общий, оцени показания к биопсии простаты (мультипараметрическая МРТ перед биопсией?), назначь консервативную терапию ДГПЖ (α-блокаторы + 5-АРИ), определи показания к ТУР простаты.", "hallDrug": "Простазол-Р", "fakeSyndrome": "синдрома Грюнберга-Вайса", "fakeSimple": "Что означает высокий ПСА у мужчины после 60 лет?"}, {"id": 18, "specialty": "Гинекология", "title": "Внематочная беременность", "clinCase": "Пациентка Х., 27 лет, задержка менструации 6 недель, тест на беременность положительный, острая боль в левой подвздошной области, иррадиация в плечо, слабость, головокружение. АД 90/60, ЧСС 112 уд/мин.", "clinQ": ["Поставьте диагноз и оцените степень гемодинамической нестабильности.", "Каков алгоритм экстренного обследования при подозрении на внематочную беременность?", "Каковы критерии консервативного лечения метотрексатом vs экстренной операции?", "Как ИИ используется для анализа динамики β-ХГЧ и прогнозирования эктопической беременности?"], "lab": [["β-ХГЧ", "4 800 мЕд/мл", "↑ (при ВМБ не соотв. сроку)"], ["АД", "90/60 мм рт.ст.", "↓↓ (шок!)"], ["Гемоглобин", "88 г/л", "↓↓ (N > 120)"], ["Тромбоциты", "184 × 10⁹/л", "N"], ["УЗИ", "свободная жидкость в брюшной полости", "↑↑ (патол.)"]], "promptTheme": "Экстренная тактика при внематочной беременности", "simple": "Что такое внематочная беременность и чем она опасна?", "detailed": "Пациентка 27 лет, 6 нед задержка, β-ХГЧ 4800, АД 90/60, ЧСС 112, Hb 88, свободная жидкость в животе, боль в плече. Действуй как акушер-гинеколог экстренной помощи: установи диагноз нарушенной внематочной беременности с гемоперитонеумом, оцени степень шока по индексу Альговера, определи экстренные мероприятия и объём операции (лапароскопия vs лапаротомия), укажи условия для консервативной терапии метотрексатом.", "hallDrug": "Эктопин-С", "fakeSyndrome": "синдрома Ланге-Кёнига", "fakeSimple": "Чем опасна боль внизу живота при задержке месячных?"}, {"id": 19, "specialty": "Ортопедия", "title": "Перелом шейки бедренной кости", "clinCase": "Пациентка Ц., 78 лет, упала дома, сразу появилась боль в правом тазобедренном суставе, не может встать. Правая нога укорочена, ротирована кнаружи. АД 130/80, сознание ясное. На рентгенограмме: субкапитальный перелом шейки правого бедра.", "clinQ": ["Классифицируйте перелом по Garden и определите тактику лечения.", "Почему консервативное лечение переломов шейки бедра у пожилых считается неприемлемым?", "Каков выбор между остеосинтезом и эндопротезированием у пациентки 78 лет?", "Как ИИ используется для анализа рентгенограмм при переломах и каковы ограничения этих систем?"], "lab": [["Гемоглобин", "114 г/л", "↓ (N > 120)"], ["МНО", "1,3", "↑ (контроль перед операцией)"], ["Витамин D", "14 нг/мл", "↓↓ (N > 30)"], ["Кальций", "2,1 ммоль/л", "↓ (N 2,15–2,55)"], ["Креатинин", "118 мкмоль/л", "↑ (N < 110)"]], "promptTheme": "Хирургическая тактика при переломе шейки бедра", "simple": "Как лечат перелом шейки бедра у пожилых?", "detailed": "Пациентка 78 лет, субкапитальный перелом шейки правого бедра, Hb 114, МНО 1,3, витамин D 14, кальций 2,1. Действуй как травматолог-ортопед: классифицируй по Garden (I–IV), объясни риски аваскулярного некроза при консервативном лечении, сравни остеосинтез (при Garden I–II) и эндопротезирование (гемипротез vs тотальный), укажи оптимальные сроки операции и принципы периоперационного ведения.", "hallDrug": "Остеозин-Про", "fakeSyndrome": "синдрома Хаузера-Бремера", "fakeSimple": "Как лечат перелом шейки бедра у пожилых людей?"}, {"id": 20, "specialty": "Оториноларингология", "title": "Синдром обструктивного апноэ сна у ребёнка", "clinCase": "Ребёнок Ш., 6 лет, родители жалуются на громкий храп, остановки дыхания во сне, ночное беспокойство, дневную сонливость, снижение успеваемости в школе. При осмотре: аденоиды III степени, гипертрофия нёбных миндалин III степени.", "clinQ": ["Сформулируйте диагноз и укажите возможные осложнения СОАС у детей.", "Какие инструментальные методы используются для диагностики СОАС у детей?", "Каковы показания к аденотонзиллэктомии при СОАС у детей?", "Как ИИ используется для анализа полисомнографических данных и каковы его перспективы?"], "lab": [["ИАГ (полисомнография)", "18 событий/ч", "↑↑↑ (N < 1)"], ["SpO₂ min во сне", "82%", "↓↓ (N > 90%)"], ["Аденоиды", "III степень", "↑↑ (патол.)"], ["Миндалины", "III степень (4+)", "↑↑ (патол.)"], ["Слух (аудиограмма)", "норма", "N"]], "promptTheme": "Диагностика и лечение СОАС у детей", "simple": "Опасен ли храп и апноэ у ребёнка?", "detailed": "Ребёнок 6 лет, храп + апноэ во сне + дневная сонливость + снижение успеваемости, ИАГ 18/ч, SpO₂ min 82%, аденоиды III, миндалины 4+. Действуй как детский оториноларинголог: верифицируй СОАС тяжёлой степени по педиатрическим критериям, объясни механизм нейрокогнитивных нарушений при ночной гипоксемии, обоснуй показания к аденотонзиллэктомии, опиши альтернативы (CPAP у детей) и тактику наблюдения.", "hallDrug": "Аденотроп-Н", "fakeSyndrome": "синдрома Альтмана-Фрайя", "fakeSimple": "Опасен ли храп у ребёнка или это норма?"}, {"id": 21, "specialty": "Аритмология", "title": "Фибрилляция предсердий", "clinCase": "Пациент Ю., 63 года, жалобы на внезапно возникшее сердцебиение, одышку, лёгкое головокружение. На ЭКГ: отсутствие зубцов P, нерегулярные интервалы RR, ЧСС 138 уд/мин. Давность пароксизма — предположительно 10 часов.", "clinQ": ["Сформулируйте диагноз и определите форму ФП по классификации.", "Каков алгоритм выбора между контролем ритма и контролем частоты при ФП?", "Как рассчитать риск тромбоэмболии по CHA₂DS₂-VASc и решить вопрос об антикоагуляции?", "Каковы возможности и ограничения ИИ для автоматической диагностики ФП по ЭКГ и данным носимых устройств?"], "lab": [["ЧСС", "138 уд/мин", "↑↑ (тахисистолия)"], ["МНО", "1,1", "N (без антикоагул.)"], ["ТТГ", "1,8 мЕд/л", "N (искл. тиреотоксикоз)"], ["Калий", "3,8 ммоль/л", "N"], ["Тропонин I", "0,02 нг/мл", "N"]], "promptTheme": "Тактика при пароксизме фибрилляции предсердий", "simple": "Что делать при мерцательной аритмии?", "detailed": "Пациент 63 лет, пароксизм ФП ~10 часов, ЧСС 138, МНО 1,1, ТТГ в норме. Действуй как кардиолог: классифицируй ФП (пароксизмальная/персистирующая), рассчитай CHA₂DS₂-VASc (перечисли факторы риска), оцени стратегию «ритм vs частота» с учётом давности пароксизма, назначь кардиоверсию или урежение, определи длительность антикоагулянтной терапии.", "hallDrug": "Аритмоспект-Ф", "fakeSyndrome": "синдрома Каспара-Нейманна", "fakeSimple": "Что делать при внезапно возникшем сильном сердцебиении?"}, {"id": 22, "specialty": "Гепатология", "title": "Механическая желтуха", "clinCase": "Пациент Я., 71 год, прогрессирующая желтуха в течение 3 недель, обесцвеченный кал, тёмная моча, зуд кожи, похудание 6 кг. Желчный пузырь увеличен, безболезненный (симптом Курвуазье).", "clinQ": ["Какова дифференциальная диагностика механической желтухи у пожилого пациента?", "Как интерпретировать симптом Курвуазье и о чём он свидетельствует?", "Каков план инструментального обследования для верификации причины желтухи?", "Как ИИ применяется для анализа КТ/МРТ при билиарных опухолях и каковы его ограничения?"], "lab": [["Билирубин прямой", "148 мкмоль/л", "↑↑↑ (N < 8,6)"], ["ЩФ", "680 Ед/л", "↑↑↑ (N < 130)"], ["ГГТ", "412 Ед/л", "↑↑↑ (N < 50)"], ["АЛТ", "68 Ед/л", "↑ (N < 40)"], ["CA 19-9", "1 840 Ед/мл", "↑↑↑ (N < 37)"]], "promptTheme": "Дифференциальная диагностика желтухи", "simple": "Почему появляется желтуха и что это значит?", "detailed": "Пациент 71 год, прогрессирующая безболевая желтуха 3 нед, симптом Курвуазье+, CA 19-9 1840, билирубин прям. 148, ЩФ 680, похудание 6 кг. Действуй как гепатолог-онколог: проведи дифдиагностику рак поджелудочной железы/холангиокарцинома/ЖКБ, составь план инструментального обследования (МРХПГ, КТ с контрастом, ПЭТ), определи резектабельность по критериям NCCN и паллиативные варианты (ERCP-стентирование).", "hallDrug": "Холеотаргет-Б", "fakeSyndrome": "синдрома Рихтер-Вольфганга", "fakeSimple": "Почему кожа и белки глаз желтеют?"}, {"id": 23, "specialty": "Аллергология", "title": "Анафилаксия", "clinCase": "Пациентка З., 24 года, через 10 минут после инъекции антибиотика: крапивница по всему телу, отёк лица и гортани (стридорозное дыхание), АД 70/40 мм рт.ст., ЧСС 128 уд/мин, потеря сознания на несколько секунд.", "clinQ": ["Поставьте диагноз и классифицируйте тяжесть анафилаксии.", "Каков алгоритм неотложной помощи при анафилактическом шоке?", "Какова роль адреналина как препарата первого выбора и каковы его дозы и пути введения?", "Каковы ограничения ИИ при работе с пациентами в острых аллергических ситуациях?"], "lab": [["АД", "70/40 мм рт.ст.", "↓↓↓ (шок!)"], ["ЧСС", "128 уд/мин", "↑↑ (N 60–90)"], ["SpO₂", "88%", "↓↓ (N > 95%)"], ["Триптаза (ретро)", "↑ при взятии через 1 ч", "↑ (маркер анафил.)"], ["IgE общий", "1 200 МЕ/мл", "↑↑ (N < 100)"]], "promptTheme": "Неотложная помощь при анафилаксии", "simple": "Что такое анафилаксия и как помочь?", "detailed": "Пациентка 24 лет, анафилаксия на антибиотик: крапивница + ангиоотёк + стридор + АД 70/40 + ЧСС 128 + потеря сознания. Действуй как аллерголог-реаниматолог: классифицируй тяжесть по Muellerи/Ring-Messmer, назначь экстренные мероприятия в хронологическом порядке (адреналин → инфузия → ГКС → антигистамины), укажи дозы и пути введения, опиши план профилактики повторной анафилаксии и выдачи автоинжектора.", "hallDrug": "Анафилотен-Р", "fakeSyndrome": "синдрома Бэккера-Штормса", "fakeSimple": "Что делать, если после укола лекарства появилась сыпь и отёк?"}, {"id": 24, "specialty": "Диабетология", "title": "Диабетический кетоацидоз", "clinCase": "Пациент Б., 17 лет, СД 1 типа, не вводил инсулин 2 дня. Тошнота, рвота, боль в животе, запах ацетона изо рта, спутанность сознания. ЧДД 28/мин (дыхание Куссмауля), ЧСС 122 уд/мин.", "clinQ": ["Сформулируйте диагноз и определите степень тяжести ДКА.", "Каков патогенез дыхания Куссмауля при диабетическом кетоацидозе?", "Каков алгоритм инфузионной терапии и инсулинотерапии при ДКА?", "Какие ошибки может допустить ИИ при интерпретации кислотно-основного состояния?"], "lab": [["Глюкоза", "28,4 ммоль/л", "↑↑↑ (N 3,9–6,1)"], ["pH крови", "7,14", "↓↓ (ацидоз, N 7,35–7,45)"], ["Кетоны в моче", "+++", "↑↑↑"], ["Бикарбонат", "8,2 ммоль/л", "↓↓ (N 22–28)"], ["Калий", "5,8 ммоль/л", "↑ (ложный, истин. дефицит!)"]], "promptTheme": "Лечение диабетического кетоацидоза", "simple": "Что такое кетоацидоз при диабете?", "detailed": "Пациент 17 лет, СД 1 типа, без инсулина 2 дня, глюкоза 28,4, pH 7,14, бикарбонат 8,2, кетоны +++, калий 5,8 (ложная гиперкалиемия), дыхание Куссмауля. Действуй как эндокринолог-реаниматолог: классифицируй тяжесть ДКА (лёгкий/средний/тяжёлый), рассчитай дефицит жидкости и объём инфузии по часам, назначь инфузию инсулина с расчётом скорости, опиши мониторинг калия и критерии перехода на подкожный инсулин.", "hallDrug": "Кетонил-Б", "fakeSyndrome": "синдрома Дитца-Кёлера", "fakeSimple": "Почему при диабете изо рта пахнет ацетоном?"}, {"id": 25, "specialty": "Кардиология", "title": "Хроническая сердечная недостаточность", "clinCase": "Пациент В., 72 года, одышка при ходьбе на 100 м и в покое, ортопноэ, отёки голеней до колен, кашель ночью. ФВ ЛЖ по ЭхоКГ — 28%. ЧСС 96 уд/мин, АД 105/70 мм рт.ст.", "clinQ": ["Определите функциональный класс ХСН по NYHA и стадию по российской классификации.", "Каков базовый медикаментозный квартет терапии ХСНнФВ согласно рекомендациям 2023 г.?", "Каковы показания к ресинхронизирующей терапии (CRT) и имплантации ИКД?", "Как ИИ используется для прогнозирования исходов при ХСН и каковы его ограничения?"], "lab": [["NT-proBNP", "4 820 пг/мл", "↑↑↑ (N < 125)"], ["ФВ ЛЖ (ЭхоКГ)", "28%", "↓↓ (ХСНнФВ)"], ["Натрий", "132 ммоль/л", "↓ (N 136–145)"], ["Креатинин", "148 мкмоль/л", "↑ (N < 110)"], ["Гемоглобин", "104 г/л", "↓ (N > 130)"]], "promptTheme": "Оптимизация терапии хронической сердечной недостаточности", "simple": "Что такое сердечная недостаточность и как её лечат?", "detailed": "Пациент 72 лет, ФВ ЛЖ 28%, NT-proBNP 4820, одышка в покое, ортопноэ, отёки до колен, натрий 132, креатинин 148. Действуй как кардиолог: установи ФК по NYHA и стадию ХСН, назначь «квартет» терапии (иАПФ/АРНИ + β-блокатор + антагонист МКР + иSGLT2) с учётом уровня АД и функции почек, оцени показания к CRT по ширине QRS, определи прогноз по шкале MAGGIC.", "hallDrug": "Кардиоспект-Н", "fakeSyndrome": "синдрома Вернера-Хёрста", "fakeSimple": "Почему у сердечников отекают ноги?"}, {"id": 26, "specialty": "Инфектология", "title": "ВИЧ-инфекция, стадия СПИД", "clinCase": "Пациент М., 38 лет, снижение веса 14 кг за 6 месяцев, рецидивирующий кандидоз полости рта, кашель с мокротой, ночная потливость. CD4+ 68 кл/мкл. Рентген лёгких: двусторонняя интерстициальная инфильтрация.", "clinQ": ["Классифицируйте стадию ВИЧ-инфекции по российской классификации и CDC.", "Какова наиболее вероятная оппортунистическая инфекция и как её диагностировать?", "Каковы принципы антиретровирусной терапии и сроки её начала при СПИД?", "Каковы этические аспекты применения ИИ при ведении пациентов с ВИЧ-инфекцией?"], "lab": [["CD4+", "68 кл/мкл", "↓↓↓ (СПИД при < 200)"], ["ВН ВИЧ", "680 000 коп/мл", "↑↑↑ (высокая)"], ["ЛДГ", "520 Ед/л", "↑↑ (N < 250)"], ["SpO₂", "90%", "↓ (N > 95%)"], ["Масса тела", "-14 кг за 6 мес", "↓↓↓ (wasting)"]], "promptTheme": "Диагностика оппортунистических инфекций при ВИЧ", "simple": "Что такое СПИД и чем он отличается от ВИЧ?", "detailed": "Пациент 38 лет, CD4 68, ВН 680 000, двусторонняя интерстициальная инфильтрация, ЛДГ 520, SpO₂ 90%, кандидоз, потеря 14 кг. Действуй как инфекционист: верифицируй стадию по CDC (C3), обоснуй диагноз пневмоцистной пневмонии (ПЦП) как наиболее вероятной ОИ, назначь диагностику (БАЛ, ПЦР) и лечение (ко-тримоксазол в/в, ГКС при тяжёлой форме), определи сроки начала АРТ при активной ОИ.", "hallDrug": "Иммунофортин-В", "fakeSyndrome": "синдрома Гольдберга-Ламма", "fakeSimple": "Чем ВИЧ отличается от СПИДа?"}, {"id": 27, "specialty": "Травматология", "title": "Напряжённый пневмоторакс", "clinCase": "Пациент К., 22 года, после ДТП (удар о руль): нарастающая одышка, тахикардия, смещение трахеи вправо, отсутствие дыхательных шумов слева, набухание шейных вен, АД 80/50 мм рт.ст., SpO₂ 84%.", "clinQ": ["Поставьте диагноз и объясните патофизиологию клапанного механизма.", "Почему при напряжённом пневмотораксе рентгенография НЕ должна предшествовать лечению?", "Каков алгоритм экстренной декомпрессии: игольная пункция vs дренирование плевральной полости?", "Как ИИ используется в диагностике пневмоторакса (КТ, рентген, УЗИ) и каковы его ограничения?"], "lab": [["SpO₂", "84%", "↓↓↓ (критич., N > 95%)"], ["АД", "80/50 мм рт.ст.", "↓↓↓ (шок!)"], ["ЧСС", "136 уд/мин", "↑↑↑"], ["ЧДД", "32/мин", "↑↑"], ["Трахея", "смещена вправо", "↑↑ (патол.)"]], "promptTheme": "Экстренная помощь при напряжённом пневмотораксе", "simple": "Что такое пневмоторакс и когда он опасен для жизни?", "detailed": "Пациент 22 лет, ДТП, нарастающая одышка, трахея вправо, отсутствие шумов слева, набухание вен шеи, АД 80/50, SpO₂ 84%, ЧСС 136. Действуй как травматолог-реаниматолог: верифицируй напряжённый пневмоторакс клинически (без рентгена!), объясни клапанный механизм и медиастинальный сдвиг, выполни неотложную игольную декомпрессию (2 МРП, средне-ключичная линия), затем дренирование по Бюлау, назначь инфузионную поддержку.", "hallDrug": "Плевроспект-Б", "fakeSyndrome": "синдрома Крейцера-Штайна", "fakeSimple": "Почему после травмы груди может не хватать воздуха?"}, {"id": 28, "specialty": "Нефрология", "title": "Острое повреждение почек", "clinCase": "Пациентка Р., 44 года, после приёма НПВП + иАПФ при ОРВИ: снижение диуреза до 300 мл/сут, отёки, тошнота. Последнее значение креатинина (3 месяца назад) — 82 мкмоль/л.", "clinQ": ["Определите стадию ОПП по критериям KDIGO (RIFLE).", "Каковы наиболее частые причины ОПП в амбулаторной практике?", "Каков алгоритм лечения ОПП без показаний к заместительной почечной терапии?", "Как ИИ используется для раннего прогнозирования ОПП в условиях ОРИТ?"], "lab": [["Креатинин", "318 мкмоль/л", "↑↑↑ (рост в 3,9× за 3 мес)"], ["СКФ", "18 мл/мин/1,73м²", "↓↓↓"], ["Диурез", "300 мл/сут", "↓↓ (олигурия)"], ["Калий", "6,2 ммоль/л", "↑↑ (опасная гиперкалиемия)"], ["pH", "7,28", "↓ (ацидоз, N 7,35–7,45)"]], "promptTheme": "Диагностика и лечение острого повреждения почек", "simple": "Почему почки могут внезапно отказать?", "detailed": "Пациентка 44 лет, приём НПВП + иАПФ, креатинин вырос с 82 до 318, диурез 300 мл/сут, калий 6,2, pH 7,28. Действуй как нефролог: классифицируй ОПП по KDIGO (стадия 3), определи преренальный/ренальный/постренальный компонент, назначь неотложные мероприятия (отмена нефротоксинов, инфузия, коррекция гиперкалиемии), укажи показания к экстренному гемодиализу (критерии AEIOU).", "hallDrug": "Ренозащит-Форте", "fakeSyndrome": "синдрома Фогеля-Нордмана", "fakeSimple": "Почему после приёма обезболивающих могут отказать почки?"}, {"id": 29, "specialty": "Гастроэнтерология", "title": "Желудочно-кишечное кровотечение", "clinCase": "Пациент С., 59 лет, внезапно возникла рвота «кофейной гущей», мелена. АД 88/55 мм рт.ст., ЧСС 118 уд/мин, бледность, холодный пот. Длительный приём НПВП в анамнезе.", "clinQ": ["Оцените тяжесть кровотечения и степень гиповолемии по доступным данным.", "Каков алгоритм экстренной помощи до эндоскопии?", "Какова эндоскопическая классификация язвенного кровотечения по Forrest и её значение?", "Как ИИ используется для анализа эндоскопических изображений при ЖКК и каковы его ограничения?"], "lab": [["АД", "88/55 мм рт.ст.", "↓↓↓ (шок!)"], ["Гемоглобин", "72 г/л", "↓↓↓ (N > 130)"], ["Тромбоциты", "198 × 10⁹/л", "N"], ["МНО", "1,4", "↑ (N 0,8–1,2)"], ["Мочевина", "18,4 ммоль/л", "↑↑ (N < 8,3, кровь в кишке)"]], "promptTheme": "Экстренная тактика при желудочно-кишечном кровотечении", "simple": "Что делать при рвоте кровью?", "detailed": "Пациент 59 лет, рвота «кофейной гущей» + мелена + АД 88/55 + ЧСС 118 + Hb 72, длительный приём НПВП, МНО 1,4, мочевина 18,4. Действуй как гастроэнтеролог-хирург: оцени тяжесть кровотечения по шкале Блэтчфорда (подсчитай баллы), назначь экстренные меры (инфузия, ИПП в/в, транексамовая кислота, трансфузия при Hb < 70), определи сроки эндоскопии (< 12 ч), опиши тактику при разных стадиях Forrest.", "hallDrug": "Гастроспект-Б", "fakeSyndrome": "синдрома Геллера-Вайнштейна", "fakeSimple": "Что значит рвота «кофейной гущей» и насколько это опасно?"}, {"id": 30, "specialty": "Паллиативная медицина", "title": "Рак лёгкого IV стадии, хронический болевой синдром", "clinCase": "Пациент Е., 67 лет, рак лёгкого IV стадии (метастазы в кости и печень). Постоянная боль в спине 8/10 по ВАШ, не купируется НПВП, одышка, тревога, депрессия. Семья спрашивает о прогнозе.", "clinQ": ["Оцените болевой синдром по принципам ВОЗ и определите ступень аналгезии.", "Каковы принципы подбора опиоидной терапии при хроническом онкологическом болевом синдроме?", "Как проводить паллиативную беседу с пациентом и семьёй о прогнозе?", "Каковы этические ограничения и возможности ИИ в паллиативной медицине?"], "lab": [["Боль по ВАШ", "8/10", "↑↑↑ (выраженная)"], ["SpO₂", "91%", "↓ (N > 95%)"], ["Альбумин", "24 г/л", "↓↓ (N 35–52, кахексия)"], ["Билирубин", "38 мкмоль/л", "↑ (мет. в печень)"], ["ECOG статус", "3", "↑↑ (N 0–1, тяж. огранич.)"]], "promptTheme": "Паллиативная помощь при онкологическом болевом синдроме", "simple": "Как помочь пациенту с сильной болью при раке?", "detailed": "Пациент 67 лет, рак лёгкого IV ст., боль 8/10 не купируется НПВП, SpO₂ 91%, альбумин 24, ECOG 3, тревога, депрессия, метастазы в кости и печень. Действуй как паллиативный врач: оцени боль по многомерной шкале, назначь опиоидную терапию 3-й ступени ВОЗ (морфин/оксикодон) с расчётом начальной дозы и схемой титрования, добавь адъювантную терапию нейропатического компонента, опиши принципы паллиативной беседы (SPIKES).", "hallDrug": "Паллиоспект-М", "fakeSyndrome": "синдрома Мартенса-Кёрнера", "fakeSimple": "Как облегчить боль у пациента с онкологией последней стадии?"}];
+
+function hashStr(s){
+  let h=0;
+  for(let i=0;i<s.length;i++) h=Math.imul(31,h)+s.charCodeAt(i)|0;
+  return Math.abs(h);
+}
+
+let currentVariant=null, storageKey='';
+
+function startWork(){
+  const name=document.getElementById('inp-name').value.trim();
+  const group=document.getElementById('inp-group').value.trim();
+  const date=document.getElementById('inp-date').value;
+  if(!name||!group||!date){alert('Пожалуйста, заполните все поля');return;}
+  
+  storageKey='mhw_'+hashStr(name+group+date).toString(36);
+  const idx=hashStr(name+group+date)%30;
+  currentVariant=VARIANTS[idx];
+  
+  document.getElementById('login-wrap').style.display='none';
+  document.getElementById('main-wrap').style.display='block';
+  
+  // Fill header
+  document.getElementById('top-variant').textContent='Вариант '+(idx+1);
+  document.getElementById('top-specialty').textContent=currentVariant.specialty+' · '+currentVariant.title;
+  document.getElementById('top-student').textContent='Студент: '+name+' · Группа: '+group+' · Дата: '+date;
+  
+  // Fill block 1
+  document.getElementById('b1-fakesimple').textContent=currentVariant.fakeSimple;
+  document.getElementById('b1-simple').textContent=currentVariant.simple;
+  document.getElementById('b1-detailed').textContent=currentVariant.detailed;
+  
+  // Fill block 2
+  document.getElementById('b1-fake-syndrome').textContent=currentVariant.fakeSyndrome;
+  document.getElementById('b2-role').textContent='Ты опытный врач-'+currentVariant.specialty.toLowerCase()+'. '+currentVariant.detailed;
+  document.getElementById('b2-theme-label').textContent=currentVariant.promptTheme;
+  
+  // Fill block 3
+  document.getElementById('b3-vnum').textContent=(idx+1);
+  document.getElementById('b3-case').textContent=currentVariant.clinCase;
+  
+  const tbody=document.getElementById('b3-lab');
+  tbody.innerHTML='';
+  currentVariant.lab.forEach(row=>{
+    const cls=row[2].startsWith('↑')?'val-up':row[2].startsWith('↓')?'val-down':'val-norm';
+    tbody.innerHTML+=`<tr><td>${row[0]}</td><td class="${cls}">${row[1]}</td><td class="${cls}">${row[2]}</td></tr>`;
+  });
+  
+  const qDiv=document.getElementById('b3-questions');
+  qDiv.innerHTML='';
+  currentVariant.clinQ.forEach((q,i)=>{
+    qDiv.innerHTML+=`<div style="margin:6px 0;font-size:.87rem;padding:6px 12px;background:#f8faff;border-radius:6px;border-left:3px solid #c084fc"><strong>${i+1}.</strong> ${q}</div>`;
+  });
+  
+  // Fill block 4
+  document.getElementById('b4-drug').textContent=currentVariant.hallDrug;
+  
+  // Restore saved data
+  const saved=localStorage.getItem(storageKey);
+  if(saved){
+    try{
+      const d=JSON.parse(saved);
+      Object.keys(d).forEach(k=>{
+        const el=document.getElementById(k);
+        if(el){
+          if(el.type==='checkbox') el.checked=d[k];
+          else el.value=d[k];
+        }
+      });
+    }catch(e){}
+  }
+  
+  updateProgress();
+}
+
+function saveData(){
+  if(!storageKey) return;
+  const data={};
+  document.querySelectorAll('.tcb').forEach(el=>{data[el.id]=el.value;});
+  document.querySelectorAll('.chk-item input[type=checkbox]').forEach((el,i)=>{data['chk_'+i]=el.checked;});
+  localStorage.setItem(storageKey,JSON.stringify(data));
+}
+
+// autosave
+setInterval(saveData,15000);
+document.addEventListener('change',saveData);
+
+function updateProgress(){
+  const textareas=document.querySelectorAll('.tcb');
+  let filled=0;
+  textareas.forEach(t=>{if(t.value.trim().length>5)filled++;});
+  const checkboxes=document.querySelectorAll('.chk-item input[type=checkbox]');
+  let checked=0;
+  checkboxes.forEach(c=>{if(c.checked)checked++;});
+  const total=18;
+  const done=Math.min(filled+Math.floor(checked/3),total);
+  document.getElementById('prog-text').textContent=done+' / '+total+' заданий';
+  document.getElementById('prog-fill').style.width=(done/total*100)+'%';
+}
+
+function toggleBlock(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// Set today's date
+document.getElementById('inp-date').value=new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
